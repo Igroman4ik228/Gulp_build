@@ -5,13 +5,13 @@ const fileInclude = require('gulp-file-include'); // Include file HTML
 const htmlmin = require('gulp-htmlmin'); // HTML minify without changing
 const webpHTML = require('gulp-webp-html-nosvg'); // Converting images to WebP format in HTML
 const typograf = require('gulp-typograf'); // Orthography correction
+
 // SASS
 const sass = require('gulp-sass')(require('sass')); // Сompilation Sass/Scss
 const sassGlob = require('gulp-sass-glob'); // Global imports
 const sourceMaps = require('gulp-sourcemaps'); // Source map in CSS
 const autoprefixer = require('gulp-autoprefixer'); // Adds prefixes in CSS to support older browsers
-const webpCss = require('gulp-webp-css'); // Converting images to WebP format in CSS
-const groupMedia = require('gulp-group-css-media-queries'); // Grouping media queries in CSS
+const cleanCSS = require('gulp-clean-css'); // Clean CSS
 
 // IMG
 const imagemin = require('gulp-imagemin'); // image compression
@@ -77,7 +77,7 @@ function html() {
 		.pipe(changed((gulpif(isProd, './docs/', './build/'))))
 		.pipe(plumber(plumberNotify('HTML')))
 		.pipe(fileInclude({
-			prefix: '@',
+			prefix: '@@',
 			basepath: '@file',
 		}))
 		.pipe(typograf({ locale: ['ru', 'en-US'] }))
@@ -90,25 +90,22 @@ function html() {
 function scss() {
 	return src('./src/scss/*.scss')
 		.pipe(changed(gulpif(isProd, './docs/css/', './build/css/')))
-		.pipe(plumber(plumberNotify('SCSS')))
 		.pipe(sourceMaps.init())
-		.pipe(gulpif(isProd, autoprefixer({ cascade: false })))
+		.pipe(gulpif(isProd, autoprefixer()))
 		.pipe(sassGlob())
-		.pipe(gulpif(isProd, webpCss()))
-		.pipe(gulpif(isProd, groupMedia()))
-		.pipe(sass(gulpif(isProd, { outputStyle: 'compressed' })))
+		.pipe(sass())
+		.pipe(gulpif(isProd, cleanCSS({ level: 2 })))
 		.pipe(sourceMaps.write())
 		.pipe(dest(gulpif(isProd, './docs/css/', './build/css/')))
 		.pipe(browserSync.stream());
 };
 
 function images() {
-	return src(['./src/img/**/*', '!./src/img/faviconss/*'])
+	return src(['./src/img/**/*', '!./src/img/favicons/*'])
 		.pipe(changed(gulpif(isProd, './docs/img/', './build/img/')))
 		.pipe(gulpif(isProd, webp()))
 		.pipe(dest(gulpif(isProd, './docs/img/', './build/img/')))
-		//
-		.pipe(gulpif(isProd, src('./src/img/**/*')))
+		.pipe(gulpif(isProd, src(['./src/img/**/*', '!./src/img/favicons/*'])))
 		.pipe(gulpif(isProd, changed('./docs/img/')))
 		.pipe(gulpif(isProd, imagemin(imageminOption, { verbose: true })))
 		.pipe(gulpif(isProd, dest('./docs/img/')));
@@ -121,8 +118,7 @@ function fonts() {
 };
 
 function files() {
-	return gulp
-		.src('./src/files/**/*')
+	return src('./src/files/**/*')
 		.pipe(changed(gulpif(isProd, './docs/files/', './build/files/')))
 		.pipe(dest(gulpif(isProd, './docs/files/', './build/files/')));
 };
@@ -172,4 +168,3 @@ exports.default = series(clear, parallel(html, scss, images, fonts, js), watchFi
 exports.docs = series(toProd, clear, parallel(html, scss, images, fonts, js), watchFiles);
 
 exports.zip = series(zipDocs);
-
