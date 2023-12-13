@@ -4,13 +4,14 @@ const { src, dest, watch, series, parallel } = require('gulp');
 const fileInclude = require('gulp-file-include'); // Include file HTML
 const htmlmin = require('gulp-htmlmin'); // HTML minify without changing
 const webpHTML = require('gulp-webp-html-nosvg'); // Converting images to WebP format in HTML
-const typograf = require('gulp-typograf'); // Converting images to WebP format in HTML
-
+const typograf = require('gulp-typograf'); // Orthography correction
 // SASS
 const sass = require('gulp-sass')(require('sass')); // Сompilation Sass/Scss
 const sassGlob = require('gulp-sass-glob'); // Global imports
+const sourceMaps = require('gulp-sourcemaps'); // Source map in CSS
 const autoprefixer = require('gulp-autoprefixer'); // Adds prefixes in CSS to support older browsers
 const webpCss = require('gulp-webp-css'); // Converting images to WebP format in CSS
+const groupMedia = require('gulp-group-css-media-queries'); // Grouping media queries in CSS
 
 // IMG
 const imagemin = require('gulp-imagemin'); // image compression
@@ -21,22 +22,19 @@ const webpack = require('webpack-stream'); // Module JS
 const babel = require('gulp-babel'); // Support for older browsers for javascript compatibility
 
 // Other
-const server = require('gulp-server-livereload'); // Load local server
-const clean = require('gulp-clean'); // Clean file
-const fs = require('fs'); // File system 
-const sourceMaps = require('gulp-sourcemaps'); // Source map in CSS
-const groupMedia = require('gulp-group-css-media-queries'); // Grouping media queries in CSS
+const browserSync = require('browser-sync').create(); // Live server
+const changed = require('gulp-changed'); // Checking for changes
 const plumber = require('gulp-plumber'); // Watch Error
 const notify = require('gulp-notify'); // Notify Error
-const changed = require('gulp-changed'); // Checking for changes
 const gulpif = require('gulp-if') // Easy "if" in gulp
+const clean = require('gulp-clean'); // Clean file
 const zip = require('gulp-zip') // Archive files
+const fs = require('fs'); // File system 
+
 
 // Production
 let isProd = false; // dev by default
 
-// const isProd = process.argv.includes("--docs");
-// const isDev = !isProd;
 
 const plumberNotify = (title) => {
 	return {
@@ -57,6 +55,12 @@ const htmlminOption = {
 	sortClassName: true,
 	sortAttributes: true
 }
+
+const imageminOption = [
+	imagemin.gifsicle({ interlaced: true }),
+	imagemin.mozjpeg({ quality: 85, progressive: true }),
+	imagemin.optipng({ optimizationLevel: 2 })
+]
 
 
 //* Tasks
@@ -79,7 +83,8 @@ function html() {
 		.pipe(typograf({ locale: ['ru', 'en-US'] }))
 		.pipe(gulpif(isProd, webpHTML()))
 		.pipe(gulpif(isProd, htmlmin(htmlminOption)))
-		.pipe(dest(gulpif(isProd, './docs/', './build/')));
+		.pipe(dest(gulpif(isProd, './docs/', './build/')))
+		.pipe(browserSync.stream());
 };
 
 function scss() {
@@ -93,32 +98,45 @@ function scss() {
 		.pipe(gulpif(isProd, groupMedia()))
 		.pipe(sass(gulpif(isProd, { outputStyle: 'compressed' })))
 		.pipe(sourceMaps.write())
-		.pipe(dest(gulpif(isProd, './docs/css/', './build/css/')));
+		.pipe(dest(gulpif(isProd, './docs/css/', './build/css/')))
+		.pipe(browserSync.stream());
 };
 
-const imageminOption = [
-	imagemin.gifsicle({ interlaced: true }),
-	imagemin.mozjpeg({ quality: 85, progressive: true }),
-	imagemin.optipng({ optimizationLevel: 2 })
-]
-
-
-
-
 function images() {
-	return src(['./src/img/**/*'])
+	return src(['./src/img/**/*', '!./src/img/faviconss/*'])
 		.pipe(changed(gulpif(isProd, './docs/img/', './build/img/')))
 		.pipe(gulpif(isProd, webp()))
 		.pipe(dest(gulpif(isProd, './docs/img/', './build/img/')))
-
+		//
 		.pipe(gulpif(isProd, src('./src/img/**/*')))
 		.pipe(gulpif(isProd, changed('./docs/img/')))
 		.pipe(gulpif(isProd, imagemin(imageminOption, { verbose: true })))
 		.pipe(gulpif(isProd, dest('./docs/img/')));
 };
 
+function fonts() {
+	return src('./src/fonts/**/*')
+		.pipe(changed(gulpif(isProd, './docs/fonts/', './build/fonts/')))
+		.pipe(dest(gulpif(isProd, './docs/fonts/', './build/fonts/')))
+		.pipe(browserSync.stream());
+};
 
 
+function watchFiles() {
+	browserSync.init({
+		server: {
+			baseDir: isProd ? './docs/' : './build/'
+		},
+	});
+	if (!isProd) {
+		watch('./src/scss/**/*.scss', parallel(scss));
+		watch('./src/html/**/*.html', parallel(html));
+		watch('./src/img/**/*', parallel(images));
+		watch('./src/fonts/**/*', parallel(fonts));
+		// watch('./src/files/**/*', parallel('files:dev'));
+		// watch('./src/js/**/*.js', parallel('js:dev'));
+	}
+};
 
 
 function zipDocs() {
@@ -128,13 +146,15 @@ function zipDocs() {
 		.pipe(dest('./'));
 };
 
+
 function toProd(done) {
 	isProd = true;
 	done();
 };
-exports.default = series(clear, parallel(html, scss, images));
 
-exports.docs = series(toProd, clear, parallel(html, scss, images));
+exports.default = series(clear, parallel(html, scss, images, fonts), watchFiles);
+
+exports.docs = series(toProd, clear, parallel(html, scss, images, fonts), watchFiles);
 
 exports.zip = series(zipDocs);
 
