@@ -6,7 +6,7 @@ const config = {
 		// about: './src/js/about.js',
 	},
 	output: {
-		filename: '[name].bundle.js',
+		filename: '[name].js',
 	},
 	module: {
 		rules: [

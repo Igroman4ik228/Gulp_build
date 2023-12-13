@@ -118,9 +118,24 @@ function fonts() {
 	return src('./src/fonts/**/*')
 		.pipe(changed(gulpif(isProd, './docs/fonts/', './build/fonts/')))
 		.pipe(dest(gulpif(isProd, './docs/fonts/', './build/fonts/')))
-		.pipe(browserSync.stream());
 };
 
+function files() {
+	return gulp
+		.src('./src/files/**/*')
+		.pipe(changed(gulpif(isProd, './docs/files/', './build/files/')))
+		.pipe(dest(gulpif(isProd, './docs/files/', './build/files/')));
+};
+
+function js() {
+	return src('./src/js/*.js')
+		.pipe(changed(gulpif(isProd, './docs/js/', './build/js/')))
+		.pipe(plumber(plumberNotify('JS')))
+		.pipe(gulpif(isProd, babel()))
+		.pipe(webpack(require('./webpack.config.js')))
+		.pipe(dest(gulpif(isProd, './docs/js/', './build/js/')))
+		.pipe(browserSync.stream());
+};
 
 function watchFiles() {
 	browserSync.init({
@@ -133,8 +148,8 @@ function watchFiles() {
 		watch('./src/html/**/*.html', parallel(html));
 		watch('./src/img/**/*', parallel(images));
 		watch('./src/fonts/**/*', parallel(fonts));
-		// watch('./src/files/**/*', parallel('files:dev'));
-		// watch('./src/js/**/*.js', parallel('js:dev'));
+		watch('./src/files/**/*', parallel(files));
+		watch('./src/js/**/*.js', parallel(js));
 	}
 };
 
@@ -152,9 +167,9 @@ function toProd(done) {
 	done();
 };
 
-exports.default = series(clear, parallel(html, scss, images, fonts), watchFiles);
+exports.default = series(clear, parallel(html, scss, images, fonts, js), watchFiles);
 
-exports.docs = series(toProd, clear, parallel(html, scss, images, fonts), watchFiles);
+exports.docs = series(toProd, clear, parallel(html, scss, images, fonts, js), watchFiles);
 
 exports.zip = series(zipDocs);
 
