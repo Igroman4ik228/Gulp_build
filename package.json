@@ -9,7 +9,7 @@
 		"zip": "gulp zip"
 	},
 	"author": "igroman4ik",
-	"license": "ISC",
+	"license": "MIT",
 	"devDependencies": {
 		"@babel/core": "^7.22.5",
 		"@babel/preset-env": "^7.22.5",
