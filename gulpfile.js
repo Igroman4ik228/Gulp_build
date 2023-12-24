@@ -1,4 +1,4 @@
-const { src, dest, watch, series, parallel } = require('gulp');
+const { src, dest, watch, series, parallel } = require('gulp')
 
 // HTML
 const fileInclude = require('gulp-file-include'); // Include file HTML
