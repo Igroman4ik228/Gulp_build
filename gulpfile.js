@@ -163,8 +163,8 @@ function toProd(done) {
 	done();
 };
 
-exports.default = series(clear, parallel(html, scss, images, fonts, js), watchFiles);
+exports.default = series(clear, parallel(html, scss, images, fonts, files, js), watchFiles);
 
-exports.docs = series(toProd, clear, parallel(html, scss, images, fonts, js), watchFiles);
+exports.docs = series(toProd, clear, parallel(html, scss, images, fonts, files, js), watchFiles);
 
 exports.zip = series(zipDocs);

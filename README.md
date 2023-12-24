@@ -16,3 +16,27 @@
 `gulp docs` - команда для продакшн-сборки проекта. Все ассеты сжаты и оптимизированы для выкладки на хостинг.
 
 `gulp zip` - команда для быстрой и автоматической упаковки всех файлов из папки __docs__ в архив docs.zip
+
+## :open_file_folder: Файловая структура
+```
+gulp-html-starter
+├── build
+├── docs
+├── src
+│   ├── html
+│   │   └── blocks
+│   ├── files
+│   ├── fonts
+│   ├── img
+│   │   └── favicons
+│   ├── js
+│   │   └── modules
+│   ├── scss
+│   │   ├── base
+│   │   └── blocks
+├── .gitignore
+├── gulpfile.js
+├── LICENSE
+├── package.json
+└── webpack.config.js
+```
