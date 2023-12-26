@@ -114,13 +114,19 @@ function images() {
 function fonts() {
 	return src('./src/fonts/**/*')
 		.pipe(changed(gulpif(isProd, './docs/fonts/', './build/fonts/')))
-		.pipe(dest(gulpif(isProd, './docs/fonts/', './build/fonts/')))
+		.pipe(dest(gulpif(isProd, './docs/fonts/', './build/fonts/')));
 };
 
 function files() {
 	return src('./src/files/**/*')
 		.pipe(changed(gulpif(isProd, './docs/files/', './build/files/')))
 		.pipe(dest(gulpif(isProd, './docs/files/', './build/files/')));
+};
+
+function robots() {
+	return src('./src/robots.txt')
+		.pipe(changed(gulpif(isProd, './docs/', './build/')))
+		.pipe(dest(gulpif(isProd, './docs/', './build/')));
 };
 
 function js() {
@@ -149,10 +155,17 @@ function watchFiles() {
 	}
 };
 
+function zipArchive() {
+	return src(['./*', '!./node_modules', '!./build', '!./docs', '!./package-lock.json', '!./archive.zip'])
+		.pipe(plumber(plumberNotify('zipArchive')))
+		.pipe(zip('archive.zip'))
+		.pipe(dest('./'));
+};
+
 
 function zipDocs() {
 	return src('./docs/**/*.*')
-		.pipe(plumber(plumberNotify('ZIP')))
+		.pipe(plumber(plumberNotify('zipDocs')))
 		.pipe(zip('docs.zip'))
 		.pipe(dest('./'));
 };
@@ -163,8 +176,10 @@ function toProd(done) {
 	done();
 };
 
-exports.default = series(clear, parallel(html, scss, images, fonts, files, js), watchFiles);
+exports.default = series(clear, parallel(html, scss, images, fonts, files, robots, js), watchFiles);
 
-exports.docs = series(toProd, clear, parallel(html, scss, images, fonts, files, js), watchFiles);
+exports.docs = series(toProd, clear, parallel(html, scss, images, fonts, files, robots, js), watchFiles);
 
-exports.zip = series(zipDocs);
+exports.zip = series(zipArchive);
+
+exports.zipdocs = series(zipDocs);
