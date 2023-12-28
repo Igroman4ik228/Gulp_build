@@ -101,7 +101,7 @@ function scss() {
 };
 
 function images() {
-	return src(['./src/img/**/*', '!./src/img/favicons/*'])
+	return src(['./src/img/**/*', '!./src/img/favicons/'])
 		.pipe(changed(gulpif(isProd, './docs/img/', './build/img/')))
 		.pipe(gulpif(isProd, webp()))
 		.pipe(dest(gulpif(isProd, './docs/img/', './build/img/')))
@@ -111,10 +111,17 @@ function images() {
 		.pipe(gulpif(isProd, dest('./docs/img/')));
 };
 
+function favicons() {
+	return src('./src/img/favicons/')
+		.pipe(changed(gulpif(isProd, './docs/img/', './build/img/')))
+		.pipe(dest(gulpif(isProd, './docs/img/', './build/img/')))
+};
+
 function fonts() {
 	return src('./src/fonts/**/*')
 		.pipe(changed(gulpif(isProd, './docs/fonts/', './build/fonts/')))
-		.pipe(dest(gulpif(isProd, './docs/fonts/', './build/fonts/')));
+		.pipe(dest(gulpif(isProd, './docs/fonts/', './build/fonts/')))
+		.pipe(browserSync.stream());
 };
 
 function files() {
@@ -156,7 +163,7 @@ function watchFiles() {
 };
 
 function zipArchive() {
-	return src(['./*', '!./node_modules', '!./build', '!./docs', '!./package-lock.json', '!./archive.zip'])
+	return src(['./*', '!./node_modules', '!./build', '!./docs', '!./package-lock.json', '!./archive.zip', '!./pnpm-lock.yaml'])
 		.pipe(plumber(plumberNotify('zipArchive')))
 		.pipe(zip('archive.zip'))
 		.pipe(dest('./'));
@@ -176,9 +183,9 @@ function toProd(done) {
 	done();
 };
 
-exports.default = series(clear, parallel(html, scss, images, fonts, files, robots, js), watchFiles);
+exports.default = series(clear, parallel(html, scss, images, favicons, fonts, files, robots, js), watchFiles);
 
-exports.docs = series(toProd, clear, parallel(html, scss, images, fonts, files, robots, js), watchFiles);
+exports.docs = series(toProd, clear, parallel(html, scss, images, favicons, fonts, files, robots, js), watchFiles);
 
 exports.zip = series(zipArchive);
 
