@@ -1,14 +1,46 @@
 .header {
-	background-color: rgb(195, 220, 231);
-	padding: 50px 0;
+	margin-top: 38px;
 
 	&>.container>.row {
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
 
 		&>.logo {
-			font-size: 32px;
+			& a {
+				display: flex;
+			}
+
+			.logo-img {
+				margin-right: -10px;
+			}
 		}
+
+		.nav {
+			margin-left: 52px;
+		}
+
+		.nav>.menu {
+			display: flex;
+			font-size: 24px;
+			font-weight: 900;
+			line-height: 28px;
+			text-transform: uppercase;
+
+			& .active {
+				color: var(--accent);
+			}
+
+			&>li:not(:first-child) {
+				margin-left: 60px;
+
+				& a {
+					transition: color 0.2s ease-in;
+
+					&:hover {
+						color: var(--hover);
+					}
+				}
+			}
+		}
+
 	}
 }

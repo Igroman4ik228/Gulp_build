@@ -1,0 +1,36 @@
+@font-face {
+    font-family: 'Rubik';
+    src: local('Rubik Black'), local('Rubik-Black'),
+        url('subset-Rubik-Black.woff2') format('woff2'),
+        url('subset-Rubik-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Rubik';
+    src: local('Rubik Medium'), local('Rubik-Medium'),
+        url('subset-Rubik-Medium.woff2') format('woff2'),
+        url('subset-Rubik-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Rubik';
+    src: local('Rubik Regular'), local('Rubik-Regular'),
+        url('subset-Rubik-Regular.woff2') format('woff2'),
+        url('subset-Rubik-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Rubik';
+    src: local('Rubik Bold'), local('Rubik-Bold'),
+        url('subset-Rubik-Bold.woff2') format('woff2'),
+        url('subset-Rubik-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
