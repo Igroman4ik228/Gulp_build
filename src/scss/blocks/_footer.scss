@@ -1,78 +1,14 @@
 .footer {
-	margin-top: 135px;
-	background-color: #262A2F;
-	padding: 22px 0 56px 0;
-	color: white;
+	background-color: rgb(62, 62, 62);
+	padding: 50px 0;
+	font-size: 32px;
+    color: #fff;
 
-	&>.container>.row {
-		display: flex;
-
-		&>.logo {
-			max-width: 163px;
-			max-height: 33px;
-
-			& a {
-				display: flex;
-				height: 100%;
-				width: 100%;
-			}
-
-			.logo-img {
-				margin-right: -3px;
-			}
-		}
-
-		.nav {
-			margin-left: 78px;
-		}
-
-		.nav>.menu {
-			display: flex;
-			font-size: 24px;
-			font-weight: 900;
-			line-height: 28px;
-			text-transform: uppercase;
-
-			& .active {
-				color: var(--accent);
-			}
-
-			&>li:not(:first-child) {
-				margin-left: 60px;
-
-				& a {
-					color: white;
-					transition: color 0.2s ease-in;
-
-					&:hover {
-						color: var(--hover);
-					}
-
-				}
-			}
-		}
+	h1 {
+		font-size: 32px;
 	}
 
-	&>.container>.bottom {
-		margin-top: 47px;
-		display: flex;
-		justify-content: space-between;
-
-		.creator {
-			font-weight: 400;
-			font-size: 24px;
-
-			& a {
-				color: var(--accent);
-				font-weight: 700;
-				text-decoration: underline;
-			}
-		}
-
-		.date {
-			font-weight: 400;
-			font-size: 24px;
-			color: var(--non-accent);
-		}
+	@media (max-width: 1200px) {
+		font-size: 26px;
 	}
 }
